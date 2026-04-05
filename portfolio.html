@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Alex Rivera | Creative Developer Portfolio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, 'Segoe UI', 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+            scroll-behavior: smooth;
+            line-height: 1.5;
+        }
+
+        /* container utility */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Hero Section with background image */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.45)), 
+                        url('https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=2072&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center 30%;
+            background-attachment: fixed;
+            color: white;
+            isolation: isolate;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            backdrop-filter: brightness(0.85) blur(1px);
+            z-index: 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            padding: 2rem;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.8rem, 8vw, 4.8rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #FFFFFF, #e2e8f0);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .hero .tagline {
+            font-size: clamp(1.1rem, 4vw, 1.4rem);
+            margin-bottom: 2rem;
+            opacity: 0.95;
+            font-weight: 400;
+            backdrop-filter: blur(2px);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1.2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.9rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .btn-primary {
+            background: #ffffff;
+            color: #0f172a;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .btn-primary:hover {
+            background: #f1f5f9;
+            transform: translateY(-4px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            border-color: rgba(255,255,255,0.6);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 1.5px solid white;
+        }
+
+        .btn-outline:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-4px);
+            backdrop-filter: blur(8px);
+        }
+
+        /* section styling */
+        section {
+            padding: 5rem 0;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .section-title span {
+            background: linear-gradient(120deg, #2563eb, #7c3aed);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 70px;
+            height: 4px;
+            background: linear-gradient(90deg, #2563eb, #7c3aed);
+            margin: 0.8rem auto 0;
+            border-radius: 4px;
+        }
+
+        /* skills grid */
+        .skills-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .skill-card {
+            background: white;
+            padding: 1.6rem 2rem;
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.08);
+            width: 150px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .skill-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 28px 40px -16px rgba(37,99,235,0.2);
+            border-color: #e2e8f0;
+        }
+
+        .skill-icon {
+            font-size: 3rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .skill-card h3 {
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        /* projects grid */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .project-card {
+            background: white;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            box-shadow: 0 15px 35px -12px rgba(0,0,0,0.1);
+            transition: all 0.35s;
+            border: 1px solid #eef2ff;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 40px -14px rgba(0,0,0,0.2);
+        }
+
+        .project-img {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.5s;
+        }
+
+        .project-card:hover .project-img {
+            transform: scale(1.02);
+        }
+
+        .project-info {
+            padding: 1.5rem;
+        }
+
+        .project-info h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-info p {
+            color: #334155;
+            margin-bottom: 1rem;
+        }
+
+        .project-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .tech-badge {
+            background: #eef2ff;
+            color: #1e40af;
+            padding: 0.3rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .project-link {
+            text-decoration: none;
+            font-weight: 600;
+            color: #2563eb;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: gap 0.2s;
+        }
+
+        .project-link:hover {
+            gap: 10px;
+        }
+
+        /* contact section with form */
+        .contact-section {
+            background: linear-gradient(120deg, #f1f5f9 0%, #ffffff 100%);
+            border-radius: 2rem;
+            margin: 0 1rem;
+        }
+
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .contact-left h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .contact-left p {
+            color: #334155;
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-detail {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .contact-icon {
+            background: #eef2ff;
+            width: 44px;
+            height: 44px;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 1.2rem;
+            font-family: inherit;
+            transition: 0.2s;
+            background: white;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
+        }
+
+        button[type="submit"] {
+            background: #0f172a;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 3rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.25s;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        button[type="submit"]:hover {
+            background: #1e293b;
+            transform: scale(0.98);
+        }
+
+        .toast-message {
+            background: #0f172a;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            animation: fadeUp 0.3s ease;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background: #0f172a;
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-top: 2rem;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                bottom: 0;
+            }
+            to {
+                opacity: 1;
+                bottom: 30px;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .contact-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            .section-title {
+                font-size: 2rem;
+            }
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+            section {
+                padding: 3rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Hero Section -->
+<section class="hero" id="home">
+    <div class="hero-content">
+        <h1>Alex Rivera</h1>
+        <div class="tagline">Creative Frontend Developer & UI Engineer — crafting immersive web experiences that blend performance with elegance.</div>
+        <div class="btn-group">
+            <a href="#projects" class="btn btn-primary">✨ View Projects</a>
+            <a href="#contact" class="btn btn-outline">📬 Contact Me</a>
+        </div>
+    </div>
+</section>
+
+<!-- Skills Section -->
+<section id="skills">
+    <div class="container">
+        <h2 class="section-title"><span>Core & Creative</span> Skills</h2>
+        <div class="skills-grid">
+            <div class="skill-card">
+                <div class="skill-icon">⚛️</div>
+                <h3>React.js</h3>
+            </div>
+            <div class="skill-card">
+                <div class="skill-icon">🟩</div>
+                <h3>Node.js</h3>
+            </div>
+            <div class="skill-card">
+                <div class="skill-icon">🎨</div>
+                <h3>Tailwind CSS</h3>
+            </div>
+            <div class="skill-card">
+                <div class="skill-icon">🧩</div>
+                <h3>TypeScript</h3>
+            </div>
+            <div class="skill-card">
+                <div class="skill-icon">🎬</div>
+                <h3>GSAP / Framer</h3>
+            </div>
+            <div class="skill-card">
+                <div class="skill-icon">🗄️</div>
+                <h3>Firebase</h3>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Projects Section -->
+<section id="projects">
+    <div class="container">
+        <h2 class="section-title"><span>Featured</span> Projects</h2>
+        <div class="projects-grid">
+            <!-- Project 1 -->
+            <div class="project-card">
+                <div class="project-img" style="background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');"></div>
+                <div class="project-info">
+                    <h3>Visionary Dashboard</h3>
+                    <p>Analytics dashboard with live data streams, dark mode, and interactive charts.</p>
+                    <div class="project-tech">
+                        <span class="tech-badge">React</span>
+                        <span class="tech-badge">D3.js</span>
+                        <span class="tech-badge">Tailwind</span>
+                    </div>
+                    <a href="#" class="project-link" onclick="showDemoToast(event, 'Visionary Dashboard demo coming soon! ✨')">Live Demo →</a>
+                </div>
+            </div>
+            <!-- Project 2 -->
+            <div class="project-card">
+                <div class="project-img" style="background-image: url('https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');"></div>
+                <div class="project-info">
+                    <h3>Nebula E‑commerce</h3>
+                    <p>Fully responsive store with cart, local storage persistence and smooth animations.</p>
+                    <div class="project-tech">
+                        <span class="tech-badge">Next.js</span>
+                        <span class="tech-badge">Redux</span>
+                        <span class="tech-badge">Stripe</span>
+                    </div>
+                    <a href="#" class="project-link" onclick="showDemoToast(event, 'Nebula store preview — interactive checkout mockup')">Live Demo →</a>
+                </div>
+            </div>
+            <!-- Project 3 -->
+            <div class="project-card">
+                <div class="project-img" style="background-image: url('https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');"></div>
+                <div class="project-info">
+                    <h3>Travel Companion</h3>
+                    <p>AI-powered trip planner with map integration and personalized recommendations.</p>
+                    <div class="project-tech">
+                        <span class="tech-badge">Vue</span>
+                        <span class="tech-badge">Mapbox</span>
+                        <span class="tech-badge">Express</span>
+                    </div>
+                    <a href="#" class="project-link" onclick="showDemoToast(event, '🌍 Explore travel companion prototype — fully interactive')">Live Demo →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Me Section -->
+<section id="contact">
+    <div class="container">
+        <div class="contact-section" style="padding: 2rem;">
+            <div class="contact-container">
+                <div class="contact-left">
+                    <h3>Let’s <span style="color:#2563eb;">connect</span> and build something remarkable</h3>
+                    <p>I'm currently open for freelance collaborations, creative challenges, or just a friendly chat about tech & design.</p>
+                    <div class="contact-detail">
+                        <div class="contact-icon">📧</div>
+                        <div>hello@alexrivera.dev</div>
+                    </div>
+                    <div class="contact-detail">
+                        <div class="contact-icon">📱</div>
+                        <div>+1 (555) 267 3421</div>
+                    </div>
+                    <div class="contact-detail">
+                        <div class="contact-icon">🌐</div>
+                        <div>github.com/alexrivera</div>
+                    </div>
+                </div>
+                <div class="contact-right">
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <input type="text" id="name" placeholder="Your name" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" id="email" placeholder="Email address" required>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="message" rows="4" placeholder="Tell me about your project or idea..." required></textarea>
+                        </div>
+                        <button type="submit" id="submitBtn">Send Message ✨</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <p>© 2026 Alex Rivera — Designed with minimal aesthetic & max performance. All concepts live.</p>
+</footer>
+
+<script>
+    // Minimal but polished JS: interactive toast notifications, form handling with simulated success, 
+    // and smooth scroll for anchor links.
+    (function() {
+        // Helper: show temporary toast message
+        function showToast(message, isError = false) {
+            // remove existing toast if any
+            const existingToast = document.querySelector('.toast-message');
+            if(existingToast) existingToast.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast-message';
+            toast.textContent = message;
+            if (isError) {
+                toast.style.background = '#b91c1c';
+                toast.style.color = '#fff';
+            } else {
+                toast.style.background = '#0f172a';
+            }
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                if(toast && toast.parentNode) toast.remove();
+            }, 3000);
+        }
+
+        // Expose to global for onclick demo links
+        window.showDemoToast = function(event, demoMessage) {
+            event.preventDefault();
+            showToast(demoMessage || "✨ Demo preview: interactive version ready in production build!");
+        };
+
+        // Smooth scroll for all internal anchor links (like hero buttons, etc)
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const targetId = this.getAttribute('href');
+                if(targetId === "#" || targetId === "") return;
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    e.preventDefault();
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    // optional: update URL hash without jumping
+                    history.pushState(null, null, targetId);
+                }
+            });
+        });
+
+        // Contact form handling
+        const form = document.getElementById('contactForm');
+        if(form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const nameInput = document.getElementById('name');
+                const emailInput = document.getElementById('email');
+                const messageInput = document.getElementById('message');
+                const submitBtn = document.getElementById('submitBtn');
+                
+                // basic validation
+                if(!nameInput.value.trim() || !emailInput.value.trim() || !messageInput.value.trim()) {
+                    showToast("❌ Please fill out all fields before sending.", true);
+                    return;
+                }
+                const emailPattern = /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/;
+                if(!emailPattern.test(emailInput.value.trim())) {
+                    showToast("⚠️ Please enter a valid email address.", true);
+                    return;
+                }
+                
+                // Simulate sending (lab exam ready - no external API needed)
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = "Sending...";
+                submitBtn.disabled = true;
+                
+                // mock async request with delay
+                setTimeout(() => {
+                    // success simulation
+                    showToast(`🎉 Thanks ${nameInput.value.split(' ')[0]}! I'll get back to you within 24h.`);
+                    form.reset();
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                }, 800);
+            });
+        }
+        
+        // Optional: add a nice little console greeting
+        console.log("%c✨ Portfolio ready | Alex Rivera — UI Engineer", "color: #2563eb; font-size: 16px; font-weight: bold;");
+        
+        // Additional: if any project cards link triggers for demo already global.
+        // Also prevent default for any unhandled anchor but we've done.
+    })();
+</script>
+
+</body>
+</html>
