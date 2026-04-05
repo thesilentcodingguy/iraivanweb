@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AJAX Quiz App</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .quiz-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .question {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .options {
+            list-style: none;
+        }
+        
+        .options li {
+            margin: 15px 0;
+            padding: 12px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .options li:hover {
+            background: #e0e7ff;
+            transform: translateX(5px);
+        }
+        
+        .options li.selected {
+            background: #667eea;
+            color: white;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        button {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .submit-btn {
+            background: #48bb78;
+            font-size: 1.1rem;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .submit-btn:hover {
+            background: #38a169;
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            display: none;
+        }
+        
+        .score {
+            font-size: 3rem;
+            color: #667eea;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        .feedback {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .feedback.correct {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .feedback.incorrect {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        
+        .loader {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+        
+        .loader::after {
+            content: '';
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .question-counter {
+            color: #666;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="quiz-card" id="quizCard">
+            <h1>📚 JavaScript Quiz</h1>
+            <div class="subtitle">Test your knowledge with AJAX-loaded questions</div>
+            
+            <div class="loader" id="loader"></div>
+            
+            <div id="quizContent">
+                <div class="question-counter" id="questionCounter"></div>
+                <div class="question" id="question"></div>
+                <ul class="options" id="options"></ul>
+                
+                <div class="nav-buttons">
+                    <button id="prevBtn" disabled>← Previous</button>
+                    <button id="nextBtn">Next →</button>
+                </div>
+                <button class="submit-btn" id="submitBtn" style="display: none;">📊 Submit Quiz</button>
+            </div>
+        </div>
+        
+        <div class="result-card" id="resultCard">
+            <h2>🎉 Quiz Completed!</h2>
+            <div class="score" id="score"></div>
+            <div id="feedback"></div>
+            <button onclick="location.reload()">🔄 Take Quiz Again</button>
+        </div>
+    </div>
+
+    <script>
+        let questions = [];
+        let currentQuestion = 0;
+        let userAnswers = [];
+        let totalQuestions = 0;
+        
+        // EXAMPLE 1: GET questions from API
+        function loadQuestions() {
+            $('#loader').show();
+            $('#quizContent').hide();
+            
+            $.ajax({
+                url: 'https://opentdb.com/api.php?amount=5&type=multiple', // Free quiz API
+                method: 'GET',
+                dataType: 'json',
+                timeout: 10000,
+                success: function(response) {
+                    console.log('Questions loaded:', response);
+                    processQuestions(response.results);
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', error);
+                    // Fallback to hardcoded questions if API fails
+                    useFallbackQuestions();
+                },
+                complete: function() {
+                    $('#loader').hide();
+                    $('#quizContent').show();
+                }
+            });
+        }
+        
+        // Process API questions
+        function processQuestions(apiQuestions) {
+            questions = apiQuestions.map((q, index) => {
+                // Combine correct and incorrect answers
+                let allOptions = [...q.incorrect_answers, q.correct_answer];
+                // Shuffle options
+                allOptions = shuffleArray(allOptions);
+                
+                return {
+                    id: index + 1,
+                    text: decodeHTMLEntities(q.question),
+                    options: allOptions.map(opt => decodeHTMLEntities(opt)),
+                    correct: decodeHTMLEntities(q.correct_answer)
+                };
+            });
+            
+            totalQuestions = questions.length;
+            userAnswers = new Array(totalQuestions).fill(null);
+            displayQuestion();
+        }
+        
+        // Fallback questions (in case API fails)
+        function useFallbackQuestions() {
+            questions = [
+                {
+                    id: 1,
+                    text: "What does AJAX stand for?",
+                    options: ["Asynchronous JavaScript and XML", "Advanced Java and XML", "Asynchronous JSON and XML", "Automated JavaScript and XHR"],
+                    correct: "Asynchronous JavaScript and XML"
+                },
+                {
+                    id: 2,
+                    text: "Which jQuery method is used to perform an AJAX request?",
+                    options: [".ajax()", ".getJSON()", ".post()", "All of the above"],
+                    correct: "All of the above"
+                },
+                {
+                    id: 3,
+                    text: "What does the 'success' callback in $.ajax() do?",
+                    options: ["Handles errors", "Runs when request succeeds", "Validates data", "Cancels the request"],
+                    correct: "Runs when request succeeds"
+                },
+                {
+                    id: 4,
+                    text: "Which HTTP method is typically used to retrieve data?",
+                    options: ["POST", "PUT", "GET", "DELETE"],
+                    correct: "GET"
+                },
+                {
+                    id: 5,
+                    text: "What is the default data type for $.ajax()?",
+                    options: ["XML", "JSON", "Text", "HTML"],
+                    correct: "Text"
+                }
+            ];
+            totalQuestions = questions.length;
+            userAnswers = new Array(totalQuestions).fill(null);
+            displayQuestion();
+        }
+        
+        // Display current question
+        function displayQuestion() {
+            const q = questions[currentQuestion];
+            $('#questionCounter').text(`Question ${currentQuestion + 1} of ${totalQuestions}`);
+            $('#question').text(q.text);
+            
+            // Generate options HTML
+            let optionsHtml = '';
+            q.options.forEach((option, index) => {
+                const isSelected = (userAnswers[currentQuestion] === option);
+                optionsHtml += `
+                    <li data-value="${escapeHtml(option)}" class="${isSelected ? 'selected' : ''}">
+                        ${option}
+                    </li>
+                `;
+            });
+            $('#options').html(optionsHtml);
+            
+            // Add click handlers to options
+            $('.options li').click(function() {
+                $('.options li').removeClass('selected');
+                $(this).addClass('selected');
+                userAnswers[currentQuestion] = $(this).data('value');
+                
+                // Enable/disable submit button if on last question
+                if (currentQuestion === totalQuestions - 1) {
+                    checkAllQuestionsAnswered();
+                }
+            });
+            
+            // Update navigation buttons
+            $('#prevBtn').prop('disabled', currentQuestion === 0);
+            
+            // Show/hide submit button
+            if (currentQuestion === totalQuestions - 1) {
+                $('#nextBtn').hide();
+                $('#submitBtn').show();
+                checkAllQuestionsAnswered();
+            } else {
+                $('#nextBtn').show();
+                $('#submitBtn').hide();
+            }
+        }
+        
+        // Check if all questions are answered
+        function checkAllQuestionsAnswered() {
+            const allAnswered = userAnswers.every(answer => answer !== null);
+            $('#submitBtn').prop('disabled', !allAnswered);
+        }
+        
+        // Navigation
+        $('#nextBtn').click(function() {
+            if (currentQuestion < totalQuestions - 1) {
+                currentQuestion++;
+                displayQuestion();
+            }
+        });
+        
+        $('#prevBtn').click(function() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                displayQuestion();
+            }
+        });
+        
+        // EXAMPLE 2: POST answers to server
+        $('#submitBtn').click(function() {
+            // Calculate score
+            let score = 0;
+            let results = [];
+            
+            questions.forEach((q, index) => {
+                const isCorrect = (userAnswers[index] === q.correct);
+                if (isCorrect) score++;
+                results.push({
+                    question: q.text,
+                    userAnswer: userAnswers[index],
+                    correctAnswer: q.correct,
+                    isCorrect: isCorrect
+                });
+            });
+            
+            const percentage = (score / totalQuestions) * 100;
+            
+            // EXAMPLE 3: Submit results to server via POST
+            $.ajax({
+                url: 'https://jsonplaceholder.typicode.com/posts', // Test endpoint
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    userId: 1,
+                    quizName: 'JavaScript Quiz',
+                    score: score,
+                    total: totalQuestions,
+                    percentage: percentage,
+                    timestamp: new Date().toISOString(),
+                    answers: results
+                }),
+                success: function(response) {
+                    console.log('Results saved to server:', response);
+                    showResults(score, percentage, results);
+                },
+                error: function(xhr, status, error) {
+                    console.warn('Could not save to server, showing results locally');
+                    showResults(score, percentage, results);
+                }
+            });
+        });
+        
+        // Display final results
+        function showResults(score, percentage, results) {
+            $('#quizCard').hide();
+            $('#resultCard').show();
+            $('#score').text(`${score} / ${totalQuestions} (${percentage}%)`);
+            
+            let feedbackHtml = '<h3>Detailed Results:</h3>';
+            results.forEach((result, index) => {
+                const statusClass = result.isCorrect ? 'correct' : 'incorrect';
+                const statusIcon = result.isCorrect ? '✅' : '❌';
+                feedbackHtml += `
+                    <div class="feedback ${statusClass}">
+                        <strong>Q${index + 1}: ${result.question}</strong><br>
+                        ${statusIcon} Your answer: ${result.userAnswer}<br>
+                        ${!result.isCorrect ? `Correct answer: ${result.correctAnswer}` : ''}
+                    </div>
+                `;
+            });
+            $('#feedback').html(feedbackHtml);
+            
+            // EXAMPLE 4: GET leaderboard data after quiz
+            $.ajax({
+                url: 'https://jsonplaceholder.typicode.com/comments?postId=1',
+                method: 'GET',
+                success: function(leaderboard) {
+                    console.log('Leaderboard data loaded:', leaderboard.slice(0, 3));
+                    // You would display leaderboard here
+                }
+            });
+        }
+        
+        // Helper functions
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        function decodeHTMLEntities(text) {
+            return $('<textarea/>').html(text).text();
+        }
+        
+        function escapeHtml(text) {
+            return $('<div/>').text(text).html();
+        }
+        
+        // Initialize quiz
+        $(document).ready(function() {
+            loadQuestions();
+        });
+    </script>
+</body>
+</html>
