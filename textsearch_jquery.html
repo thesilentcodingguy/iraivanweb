@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Article Search & Filter</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>📚 Article Library</h2>
+        
+        <!-- Search Section -->
+        <div class="search-section">
+            <input type="text" id="searchInput" placeholder="Search articles by title, content, or author... (Ctrl+K to focus)" style="width: 70%; padding: 10px; font-size: 16px;">
+            <button id="clearSearch" style="display: none; padding: 10px 20px; margin-left: 10px; cursor: pointer;">✖ Clear</button>
+        </div>
+        
+        <!-- Filter Buttons -->
+        <div class="filter-section" style="margin: 20px 0;">
+            <button class="filter-btn" data-filter="all" style="padding: 8px 16px; margin-right: 10px; cursor: pointer; background: #667eea; color: white; border: none;">All</button>
+            <button class="filter-btn" data-filter="programming" style="padding: 8px 16px; margin-right: 10px; cursor: pointer; background: #f0f0f0; border: none;">💻 Programming</button>
+            <button class="filter-btn" data-filter="web" style="padding: 8px 16px; margin-right: 10px; cursor: pointer; background: #f0f0f0; border: none;">🌐 Web</button>
+            <button class="filter-btn" data-filter="database" style="padding: 8px 16px; margin-right: 10px; cursor: pointer; background: #f0f0f0; border: none;">🗄️ Database</button>
+        </div>
+        
+        <!-- Results Info -->
+        <div id="resultCount" style="margin: 10px 0; color: #666;">Showing 6 articles</div>
+        
+        <!-- Article List -->
+        <ul id="articleList" style="list-style: none; padding: 0;"></ul>
+    </div>
+
+    <style>
+        /* Minimal inline styles for better visibility */
+        .article-item {
+            border: 1px solid #ddd;
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 8px;
+            background: white;
+            transition: all 0.3s;
+        }
+        .article-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .article-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .article-content {
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        .article-meta {
+            font-size: 12px;
+            color: #999;
+            margin-top: 10px;
+        }
+        .highlight {
+            background-color: yellow;
+            font-weight: bold;
+        }
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+
+    <script>
+        $(document).ready(function() {
+            // Article data
+            const articles = [
+                {
+                    id: 1,
+                    title: "Getting Started with Ruby on Rails",
+                    content: "Ruby on Rails is a powerful web application framework that makes web development fun and easy. Learn how to build your first Rails application with this comprehensive guide.",
+                    category: "programming",
+                    date: "2024-01-15",
+                    author: "John Doe"
+                },
+                {
+                    id: 2,
+                    title: "JavaScript ES6 Features You Should Know",
+                    content: "ES6 introduced many powerful features to JavaScript including arrow functions, classes, template literals, and destructuring. Master these features to write better code.",
+                    category: "programming",
+                    date: "2024-01-20",
+                    author: "Jane Smith"
+                },
+                {
+                    id: 3,
+                    title: "Building RESTful APIs with Node.js",
+                    content: "Learn how to design and build scalable RESTful APIs using Node.js and Express. This tutorial covers routing, middleware, authentication, and best practices.",
+                    category: "web",
+                    date: "2024-01-25",
+                    author: "Mike Johnson"
+                },
+                {
+                    id: 4,
+                    title: "Database Design Best Practices",
+                    content: "Proper database design is crucial for application performance. Learn about normalization, indexing, and relationships in this comprehensive database guide.",
+                    category: "database",
+                    date: "2024-02-01",
+                    author: "Sarah Wilson"
+                },
+                {
+                    id: 5,
+                    title: "Introduction to React Hooks",
+                    content: "React Hooks revolutionized how we write React components. Learn about useState, useEffect, and custom hooks in this beginner-friendly tutorial.",
+                    category: "web",
+                    date: "2024-02-05",
+                    author: "Tom Brown"
+                },
+                {
+                    id: 6,
+                    title: "Python for Data Science",
+                    content: "Python has become the go-to language for data science. Learn about pandas, numpy, and matplotlib in this hands-on tutorial for beginners.",
+                    category: "programming",
+                    date: "2024-02-10",
+                    author: "Emily Davis"
+                }
+            ];
+
+            let currentFilter = 'all';
+            let searchTerm = '';
+
+            // Function to highlight text
+            function highlightText(text, term) {
+                if (!term) return text;
+
+                const regex = new RegExp(`(${term})`, 'gi');
+                return text.replace(regex, '<span class="highlight">$1</span>');
+            }
+
+            // Function to render articles
+            function renderArticles() {
+                const $articleList = $('#articleList');
+                const searchTermLower = searchTerm.toLowerCase();
+
+                // Filter articles based on search term and category filter
+                const filteredArticles = articles.filter(article => {
+                    // First apply category filter
+                    if (currentFilter !== 'all' && article.category !== currentFilter) {
+                        return false;
+                    }
+
+                    // Then apply search filter
+                    if (searchTermLower) {
+                        const titleMatch = article.title.toLowerCase().includes(searchTermLower);
+                        const contentMatch = article.content.toLowerCase().includes(searchTermLower);
+                        const authorMatch = article.author.toLowerCase().includes(searchTermLower);
+                        return titleMatch || contentMatch || authorMatch;
+                    }
+
+                    return true;
+                });
+
+                // Update article count
+                $('#articleCount').text(filteredArticles.length);
+                $('#resultCount').text(`Showing ${filteredArticles.length} article${filteredArticles.length !== 1 ? 's' : ''}`);
+
+                if (filteredArticles.length === 0) {
+                    $articleList.html(`
+                        <div class="no-results">
+                            <i>🔍</i>
+                            <p>No articles found matching "${searchTerm}"</p>
+                            <p style="font-size: 14px; margin-top: 10px;">Try different keywords or clear the search</p>
+                        </div>
+                    `);
+                    return;
+                }
+
+                // Build HTML for filtered articles
+                let articlesHtml = '';
+                filteredArticles.forEach(article => {
+                    let titleDisplay = article.title;
+                    let contentDisplay = article.content;
+                    let authorDisplay = article.author;
+
+                    // Apply highlighting if there's a search term
+                    if (searchTerm) {
+                        titleDisplay = highlightText(article.title, searchTerm);
+                        contentDisplay = highlightText(article.content, searchTerm);
+                        authorDisplay = highlightText(article.author, searchTerm);
+                    }
+
+                    articlesHtml += `
+                        <li class="article-item" data-category="${article.category}">
+                            <div class="article-title">${titleDisplay}</div>
+                            <div class="article-content">${contentDisplay}</div>
+                            <div class="article-meta">
+                                <span>✍️ ${authorDisplay}</span> |
+                                <span>📅 ${article.date}</span> |
+                                <span>🏷️ ${article.category}</span>
+                            </div>
+                        </li>
+                    `;
+                });
+
+                $articleList.html(articlesHtml);
+
+                // Animate new items
+                $('.article-item').hide().fadeIn(500);
+            }
+
+            // Search input handler
+            $('#searchInput').on('input', function() {
+                searchTerm = $(this).val();
+                renderArticles();
+            });
+
+            // Clear search button
+            $('#clearSearch').on('click', function() {
+                $('#searchInput').val('');
+                searchTerm = '';
+                renderArticles();
+                $(this).hide().fadeOut(200);
+            });
+
+            // Show/hide clear button based on input
+            $('#searchInput').on('keyup', function() {
+                if ($(this).val().length > 0) {
+                    $('#clearSearch').fadeIn(200);
+                } else {
+                    $('#clearSearch').fadeOut(200);
+                }
+            });
+
+            // Filter buttons
+            $('.filter-btn').on('click', function() {
+                $('.filter-btn').removeClass('active');
+                $(this).addClass('active');
+                currentFilter = $(this).data('filter');
+                renderArticles();
+            });
+
+            // Keyboard shortcut: Ctrl + K to focus search
+            $(document).on('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'k') {
+                    e.preventDefault();
+                    $('#searchInput').focus();
+                }
+            });
+
+            // Initial render
+            renderArticles();
+
+            // Add some statistics
+            function updateSearchStats() {
+                if (searchTerm) {
+                    const highlightedCount = $('.highlight').length;
+                    if (highlightedCount > 0) {
+                        $('#resultCount').append(` | ${highlightedCount} matches found`);
+                    }
+                }
+            }
+            
+            // Call updateSearchStats after each render
+            const originalRender = renderArticles;
+            renderArticles = function() {
+                originalRender();
+                updateSearchStats();
+            };
+            
+            // Re-initialize after function override
+            renderArticles();
+        });
+    </script>
+</body>
+</html>
