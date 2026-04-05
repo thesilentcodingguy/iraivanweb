@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Deal Timer - Flash Sale</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+    <div class="deal-container">
+        <h2>⚡ FLASH SALE ⚡</h2>
+        
+        <div id="stockInfo">꽅꽆 Only 5 left in stock!</div>
+        
+        <div class="timer-wrapper">
+            <div class="progress-bar">
+                <div id="progress" style="width: 100%; height: 10px;"></div>
+            </div>
+            <div id="timer" style="font-size: 48px; font-weight: bold; margin: 20px 0;">05:00</div>
+        </div>
+        
+        <button id="buyBtn" style="padding: 15px 30px; font-size: 18px; cursor: pointer;">BUY NOW</button>
+        
+        <div id="expiredMessage" style="display: none; color: red; margin-top: 10px;">
+            ⏰ Time's up! The deal has expired.
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Set initial time (5 minutes in seconds)
+            let totalSeconds = 10; // 5 minutes = 300 seconds
+            let timerInterval;
+
+            // DOM elements
+            const $timer = $('#timer');
+            const $buyBtn = $('#buyBtn');
+            const $expiredMessage = $('#expiredMessage');
+            const $progress = $('#progress');
+
+            // Format time as MM:SS
+            function formatTime(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+
+            // Update progress bar
+            function updateProgress() {
+                const percentage = (totalSeconds / 300) * 100;
+                $progress.css('width', percentage + '%');
+
+                // Change progress bar color based on time left
+                if (percentage > 50) {
+                    $progress.css('background', 'linear-gradient(90deg, #4cd964, #5ac8fa)');
+                } else if (percentage > 20) {
+                    $progress.css('background', 'linear-gradient(90deg, #ffcc00, #ff9500)');
+                } else {
+                    $progress.css('background', 'linear-gradient(90deg, #ff3b30, #ff2d55)');
+                }
+            }
+
+            // Update stock message based on time
+            function updateStockMessage() {
+                const $stockInfo = $('#stockInfo');
+                if (totalSeconds > 180) { // More than 3 minutes
+                    $stockInfo.text('꽅꽆 Only 5 left in stock!').css('color', '#27ae60');
+                } else if (totalSeconds > 60) { // 1-3 minutes
+                    $stockInfo.text(' Only 2 left in stock!').css('color', '#ff9500');
+                } else { // Less than 1 minute
+                    $stockInfo.text(' Last item! Hurry! ').css('color', '#ff3b30');
+                }
+            }
+
+            // Timer function
+            function startTimer() {
+                timerInterval = setInterval(function() {
+                    if (totalSeconds <= 0) {
+                        // Timer expired
+                        clearInterval(timerInterval);
+                        $timer.text('00:00').addClass('expired');
+                        $buyBtn.prop('disabled', true);
+                        $expiredMessage.fadeIn();
+                        $progress.css('width', '0%');
+                        $('#stockInfo').text(' Out of stock').css('color', '#ff3b30');
+                    } else {
+                        totalSeconds--;
+                        $timer.text(formatTime(totalSeconds));
+                        updateProgress();
+                        updateStockMessage();
+
+                        // Add urgency effect in last 10 seconds
+                        if (totalSeconds <= 10) {
+                            $timer.css('color', '#ff3b30').css('transform', 'scale(1.1)');
+                            $timer.animate({ transform: 'scale(1)' }, 500);
+                        }
+                    }
+                }, 1000);
+            }
+
+            // Start the timer
+            startTimer();
+
+            // Buy button click handler
+            $buyBtn.on('click', function() {
+                if (!$(this).prop('disabled')) {
+                    // Success animation
+                    $(this).text('✓ PURCHASED!').css('background', '#4cd964');
+
+                    // Show success message
+                    const $successMsg = $('<div>', {
+                        class: 'expired-message',
+                        text: '薋薌薍薎薏薐薓薔薕薖薑薒薗 Purchase successful! Thank you for your order!',
+                        css: {
+                            display: 'block',
+                            color: '#4cd964',
+                            animation: 'fadeIn 0.5s'
+                        }
+                    });
+
+                    $('.deal-container').append($successMsg);
+
+                    // Reset button after 3 seconds
+                    setTimeout(function() {
+                        $buyBtn.text('BUY NOW').css('background', 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)');
+                        $successMsg.fadeOut(function() {
+                            $(this).remove();
+                        });
+                    }, 3000);
+                }
+            });
+            
+            // Add hover effect for last 10 seconds
+            $timer.on('mouseenter', function() {
+                if (totalSeconds <= 10 && totalSeconds > 0) {
+                    $(this).css('animation', 'pulse 0.5s infinite');
+                }
+            }).on('mouseleave', function() {
+                $(this).css('animation', 'none');
+            });
+            
+            // Keyboard shortcut for reset (for testing purposes)
+            $(document).on('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'r') {
+                    e.preventDefault();
+                    clearInterval(timerInterval);
+                    totalSeconds = 300;
+                    $timer.text('05:00').removeClass('expired').css('color', '').css('transform', '');
+                    $buyBtn.prop('disabled', false);
+                    $expiredMessage.fadeOut();
+                    updateProgress();
+                    updateStockMessage();
+                    startTimer();
+                }
+            });
+            
+            // Initial updates
+            updateProgress();
+            updateStockMessage();
+        });
+    </script>
+</body>
+</html>
