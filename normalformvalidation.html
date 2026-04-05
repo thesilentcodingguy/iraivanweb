@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Hotel Booking System | Horizon Stay</title>
+    <style>
+        /* ========== style.css (fully preserved, no changes) ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #000000ff 0%, #000000ff 100%);
+            min-height: 100vh;
+        }
+        .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 70vh;
+        }
+        .form-container {
+            background: white;
+            border-radius: 35px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 80%;
+            max-width: 400px;
+        }
+        .form-container h2 {
+            color: #2d3748;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 1rem;
+        }
+        fieldset {
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            background: #f7fafc;
+        }
+        legend {
+            padding: 0 15px;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.5rem;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px;
+        }
+        .form-group {
+            margin-bottom: 0px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0px;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.8rem;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.6rem;
+            transition: border-color 0.3s ease;
+            background: white;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .form-group input::placeholder {
+            color: #a0aec0;
+        }
+        .error {
+            color: #e53e3e;
+            font-size: 0.5rem;
+            margin-top: 5px;
+            display: block;
+            min-height: 20px;
+        }
+        .success-message {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.7rem;
+            border: 2px solid #9ae6b4;
+            display: none;
+        }
+        .submit-btn {
+            background: linear-gradient(135deg, #080c1bff 0%, #1e023aff 100%);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 28px;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-top: 10px;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            .form-container {
+                padding: 25px;
+            }
+            header h1 {
+                font-size: 2.2rem;
+            }
+            .form-container h2 {
+                font-size: 1.6rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .page-container {
+                padding: 10px;
+            }
+            .form-container {
+                padding: 20px;
+            }
+            fieldset {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <header>
+            <h1>🏨 Horizon Stay</h1>
+            <div class="subtitle">Luxury Redefined | Book Your Perfect Getaway</div>
+        </header>
+        <main class="container">
+            <div class="form-container">
+                <h2>Booking Details</h2>
+                <form id="bookingForm">
+                    <div class="form-group">
+                        <label for="name">Full Name *</label>
+                        <input type="text" id="name" placeholder="Enter your full name">
+                        <small class="error" id="nameError"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="text" id="email" placeholder="example@domain.com">
+                        <small class="error" id="emailError"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mobile">Mobile Number *</label>
+                        <input type="tel" id="mobile" placeholder="10-digit number">
+                        <small class="error" id="mobileError"></small>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="checkin">Check-in Date *</label>
+                            <input type="date" id="checkin">
+                            <small class="error" id="checkinError"></small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="checkout">Check-out Date *</label>
+                            <input type="date" id="checkout">
+                            <small class="error" id="checkoutError"></small>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="guests">Number of Guests *</label>
+                            <input type="number" id="guests" min="1" max="6" value="1">
+                            <small class="error" id="guestsError"></small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="room">Room Type *</label>
+                            <select id="room">
+                                <option value="">Select Room Type</option>
+                                <option value="single">Single Room ($99/night)</option>
+                                <option value="double">Double Room ($149/night)</option>
+                                <option value="suite">Suite ($249/night)</option>
+                            </select>
+                            <small class="error" id="roomError"></small>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Book Now</button>
+                </form>
+
+                <div id="successMsg" class="success-message"></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ========== script.js (exactly preserved, no changes) ==========
+        const bookingForm = document.getElementById('bookingForm');
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const mobileInput = document.getElementById('mobile');
+        const checkinInput = document.getElementById('checkin');
+        const checkoutInput = document.getElementById('checkout');
+        const guestsInput = document.getElementById('guests');
+        const roomSelect = document.getElementById('room');
+        const successMsg = document.getElementById('successMsg');
+        
+        const today = new Date().toISOString().split('T')[0];
+        checkinInput.min = today;
+        
+        checkinInput.addEventListener('change', function() {
+            checkoutInput.min = this.value;
+            if (checkoutInput.value && checkoutInput.value < this.value) {
+                checkoutInput.value = '';
+            }
+        });
+        
+        bookingForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+        
+            const errorElements = document.querySelectorAll('.error');
+            errorElements.forEach(el => el.textContent = '');
+        
+            successMsg.textContent = '';
+            successMsg.style.display = 'none';
+        
+            const name = nameInput.value.trim();
+            const email = emailInput.value.trim();
+            const mobile = mobileInput.value.trim();
+            const checkin = checkinInput.value;
+            const checkout = checkoutInput.value;
+            const guests = parseInt(guestsInput.value);
+            const room = roomSelect.value;
+        
+            let isValid = true;
+        
+            if (name === '' || !/^[A-Za-z\s]{2,}$/.test(name)) {
+                document.getElementById('nameError').textContent = 'Enter valid name (letters only, min 2 chars)';
+                isValid = false;
+            }
+        
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                document.getElementById('emailError').textContent = 'Enter valid email address';
+                isValid = false;
+            }
+        
+            if (!/^\d{10}$/.test(mobile)) {
+                document.getElementById('mobileError').textContent = 'Mobile must be 10 digits';
+                isValid = false;
+            }
+        
+            if (checkin < today) {
+                document.getElementById('checkinError').textContent = 'Check-in must be today or later';
+                isValid = false;
+            }
+        
+            if (checkout <= checkin) {
+                document.getElementById('checkoutError').textContent = 'Check-out must be after check-in';
+                isValid = false;
+            }
+        
+            if (guests < 1 || guests > 6) {
+                document.getElementById('guestsError').textContent = 'Guests must be 1-6';
+                isValid = false;
+            }
+        
+            if (room === '') {
+                document.getElementById('roomError').textContent = 'Please select a room type';
+                isValid = false;
+            }
+        
+            if (isValid) {
+                successMsg.textContent = `✅ Booking Successful! Confirmation sent to ${email}`;
+                successMsg.style.display = 'block';
+        
+                setTimeout(() => {
+                    bookingForm.reset();
+                    successMsg.style.display = 'none';
+                    checkinInput.min = new Date().toISOString().split('T')[0];
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
