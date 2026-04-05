@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>✨ Universal Form Validation Engine | Hotel Booking System Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* card container */
+        .form-card {
+            max-width: 780px;
+            width: 100%;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(0px);
+            border-radius: 2rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .form-header {
+            background: #1e293b;
+            padding: 1.5rem 2rem;
+            color: white;
+        }
+
+        .form-header h1 {
+            font-weight: 700;
+            font-size: 1.8rem;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-header p {
+            opacity: 0.8;
+            margin-top: 0.3rem;
+            font-size: 0.9rem;
+        }
+
+        .form-body {
+            padding: 2rem 2rem 2rem 2rem;
+        }
+
+        .form-row {
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #0f172a;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .required-star {
+            color: #e11d48;
+            font-size: 1rem;
+        }
+
+        input, select, textarea {
+            padding: 0.85rem 1rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 1rem;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            background: #fefefe;
+            outline: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+        }
+
+        .error-message {
+            font-size: 0.75rem;
+            color: #e11d48;
+            margin-top: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 500;
+        }
+
+        .field-error {
+            border-color: #e11d48 !important;
+            background-color: #fff5f5;
+        }
+
+        .form-actions {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-submit {
+            background: #0f172a;
+            color: white;
+            border: none;
+            padding: 0.9rem 2rem;
+            border-radius: 2rem;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            flex: 1;
+        }
+
+        .btn-submit:hover {
+            background: #1e293b;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.2);
+        }
+
+        .btn-reset {
+            background: #f1f5f9;
+            border: none;
+            padding: 0.9rem 2rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #334155;
+        }
+
+        .btn-reset:hover {
+            background: #e2e8f0;
+        }
+
+        .success-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0f172a;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 60px;
+            font-weight: 500;
+            z-index: 1000;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+            backdrop-filter: blur(8px);
+            background: #065f46;
+            font-size: 0.95rem;
+        }
+
+        .error-toast {
+            background: #b91c1c;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                bottom: 0;
+            }
+            to {
+                opacity: 1;
+                bottom: 30px;
+            }
+        }
+
+        .helper-text {
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+
+        hr {
+            margin: 0.5rem 0 1.2rem;
+            border-color: #eef2ff;
+        }
+
+        @media (max-width: 550px) {
+            .form-body {
+                padding: 1.5rem;
+            }
+            .form-header h1 {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-card">
+    <div class="form-header">
+        <h1>🏨 Hotel Horizon · Smart Booking</h1>
+        <p>Secure your stay | Real-time validation & error feedback</p>
+    </div>
+    <div class="form-body">
+        <form id="hotelBookingForm" novalidate>
+            <!-- FULL NAME -->
+            <div class="form-row" data-field="fullname">
+                <label>👤 Full Name <span class="required-star">*</span></label>
+                <input type="text" id="fullname" name="fullname" placeholder="e.g., Olivia Chen" autocomplete="off">
+                <div class="error-message" id="fullnameError"></div>
+                <div class="helper-text">Must contain at least 3 letters, only alphabets and spaces.</div>
+            </div>
+
+            <!-- EMAIL ADDRESS -->
+            <div class="form-row" data-field="email">
+                <label>📧 Email Address <span class="required-star">*</span></label>
+                <input type="email" id="email" name="email" placeholder="hello@example.com">
+                <div class="error-message" id="emailError"></div>
+            </div>
+
+            <!-- MOBILE NUMBER -->
+            <div class="form-row" data-field="mobile">
+                <label>📞 Mobile Number <span class="required-star">*</span></label>
+                <input type="tel" id="mobile" name="mobile" placeholder="+1 9876543210 or 10-digit number">
+                <div class="error-message" id="mobileError"></div>
+                <div class="helper-text">Accepts international format (+XX) or 10-15 digits.</div>
+            </div>
+
+            <!-- CHECK-IN DATE -->
+            <div class="form-row" data-field="checkin">
+                <label>📅 Check-in Date <span class="required-star">*</span></label>
+                <input type="date" id="checkin" name="checkin">
+                <div class="error-message" id="checkinError"></div>
+            </div>
+
+            <!-- CHECK-OUT DATE -->
+            <div class="form-row" data-field="checkout">
+                <label>📅 Check-out Date <span class="required-star">*</span></label>
+                <input type="date" id="checkout" name="checkout">
+                <div class="error-message" id="checkoutError"></div>
+            </div>
+
+            <!-- NUMBER OF GUESTS -->
+            <div class="form-row" data-field="guests">
+                <label>👥 Number of Guests <span class="required-star">*</span></label>
+                <input type="number" id="guests" name="guests" min="1" max="20" placeholder="e.g., 2">
+                <div class="error-message" id="guestsError"></div>
+            </div>
+
+            <!-- ROOM TYPE DROPDOWN -->
+            <div class="form-row" data-field="roomType">
+                <label>🛏️ Room Type <span class="required-star">*</span></label>
+                <select id="roomType" name="roomType">
+                    <option value="">-- Select Room Category --</option>
+                    <option value="standard">Standard King</option>
+                    <option value="deluxe">Deluxe Ocean View</option>
+                    <option value="suite">Presidential Suite</option>
+                    <option value="family">Family Connecting Room</option>
+                </select>
+                <div class="error-message" id="roomTypeError"></div>
+            </div>
+
+            <!-- EXTRA NOTES: optional but shows extensibility -->
+            <div class="form-row" data-field="specialRequests">
+                <label>💬 Special Requests (optional)</label>
+                <textarea id="specialRequests" rows="2" placeholder="Extra pillows, late check-in, etc."></textarea>
+                <div class="error-message" id="specialRequestsError"></div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">✨ Confirm Booking</button>
+                <button type="button" class="btn-reset" id="resetFormBtn">⟳ Reset All</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    // UNIVERSAL & EXTENSIBLE FORM VALIDATION MODULE
+    // Use-case: HOTEL BOOKING (can be adapted to any form)
+    // Features:
+    //  - Real-time validation (on blur) + full validation on submit
+    //  - Customizable rules: regex, required, custom logic (date comparison)
+    //  - Displays dynamic error messages
+    //  - Prevents submission if invalid
+    //  - Success message with booking summary
+    //  - Easy to extend: just add new fields & rules inside config
+    // ============================================================
+
+    (function() {
+        // ---------- 1. Helper: Show floating messages ----------
+        function showFloatingMessage(message, isError = false) {
+            const existing = document.querySelector('.success-toast');
+            if(existing) existing.remove();
+            const toast = document.createElement('div');
+            toast.className = 'success-toast';
+            if(isError) toast.classList.add('error-toast');
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }
+
+        // ---------- 2. Clear a specific field error UI ----------
+        function clearFieldError(fieldId) {
+            const inputElement = document.getElementById(fieldId);
+            if(inputElement) inputElement.classList.remove('field-error');
+            const errorSpan = document.getElementById(`${fieldId}Error`);
+            if(errorSpan) errorSpan.innerHTML = '';
+        }
+
+        function setFieldError(fieldId, message) {
+            const inputElement = document.getElementById(fieldId);
+            if(inputElement) inputElement.classList.add('field-error');
+            const errorSpan = document.getElementById(`${fieldId}Error`);
+            if(errorSpan) errorSpan.innerHTML = message ? `⚠️ ${message}` : '';
+        }
+
+        // ---------- 3. CORE VALIDATION RULES (extensible object) ----------
+        // Each field has its own validator function. Returns error string or null (valid)
+        const validationRules = {
+            fullname: (value) => {
+                const trimmed = value.trim();
+                if(!trimmed) return "Full name is required.";
+                if(trimmed.length < 3) return "Name must have at least 3 characters.";
+                const nameRegex = /^[A-Za-z\s\u00C0-\u00FF]+$/; // supports letters & spaces, accented letters
+                if(!nameRegex.test(trimmed)) return "Name can only contain letters and spaces.";
+                return null;
+            },
+            email: (value) => {
+                const trimmed = value.trim();
+                if(!trimmed) return "Email address is required.";
+                const emailRegex = /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/;
+                if(!emailRegex.test(trimmed)) return "Enter a valid email (e.g., name@domain.com).";
+                return null;
+            },
+            mobile: (value) => {
+                const trimmed = value.trim();
+                if(!trimmed) return "Mobile number is required.";
+                // supports: +1 1234567890, 1234567890, +91-9876543210, spaces, digits, plus, dash
+                const mobileRegex = /^[\+\d\s\-\(\)]{8,20}$/;
+                if(!mobileRegex.test(trimmed)) return "Enter a valid phone number (10-15 digits, +, spaces allowed).";
+                const digitsOnly = trimmed.replace(/\D/g, '');
+                if(digitsOnly.length < 8 || digitsOnly.length > 15) return "Mobile number must have 8 to 15 digits.";
+                return null;
+            },
+            checkin: (value) => {
+                if(!value) return "Check-in date is required.";
+                const selectedDate = new Date(value);
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                if(selectedDate < today) return "Check-in date cannot be in the past.";
+                return null;
+            },
+            checkout: (value, formValues) => {
+                if(!value) return "Check-out date is required.";
+                const checkinDate = formValues.checkin ? new Date(formValues.checkin) : null;
+                const checkoutDate = new Date(value);
+                if(checkinDate && checkoutDate <= checkinDate) {
+                    return "Check-out date must be after check-in date.";
+                }
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                if(checkoutDate < today) return "Check-out date cannot be in the past.";
+                return null;
+            },
+            guests: (value) => {
+                const num = parseInt(value, 10);
+                if(isNaN(value) || value === "") return "Number of guests is required.";
+                if(isNaN(num) || num < 1) return "Must be at least 1 guest.";
+                if(num > 20) return "Maximum 20 guests per booking.";
+                return null;
+            },
+            roomType: (value) => {
+                if(!value) return "Please select a room type.";
+                return null;
+            },
+            // specialRequests is optional, but we can still provide extensibility (no error)
+            specialRequests: () => null
+        };
+
+        // ---------- 4. Function to validate a single field + update UI (real-time) ----------
+        function validateField(fieldId, allValues = null) {
+            const inputElem = document.getElementById(fieldId);
+            if(!inputElem) return true;
+            let value = inputElem.value;
+            if(fieldId === 'guests') value = inputElem.value; // keep raw for number
+            
+            // For checkout we need full form values context (checkin value)
+            let dynamicValues = allValues;
+            if(!dynamicValues) {
+                dynamicValues = {};
+                // gather current form values if not provided
+                const fields = ['fullname','email','mobile','checkin','checkout','guests','roomType','specialRequests'];
+                fields.forEach(f => {
+                    const el = document.getElementById(f);
+                    if(el) dynamicValues[f] = (f === 'guests') ? el.value : el.value;
+                    else dynamicValues[f] = '';
+                });
+            }
+            
+            let errorMsg = null;
+            const rule = validationRules[fieldId];
+            if(rule) {
+                if(fieldId === 'checkout') {
+                    errorMsg = rule(value, dynamicValues);
+                } else {
+                    errorMsg = rule(value);
+                }
+            }
+            
+            if(errorMsg) {
+                setFieldError(fieldId, errorMsg);
+                return false;
+            } else {
+                clearFieldError(fieldId);
+                return true;
+            }
+        }
+
+        // ---------- 5. Validate Entire Form (returns boolean) ----------
+        function validateFullForm() {
+            // Gather current values for cross-field dependency (checkout uses checkin)
+            const formState = {
+                fullname: document.getElementById('fullname')?.value || '',
+                email: document.getElementById('email')?.value || '',
+                mobile: document.getElementById('mobile')?.value || '',
+                checkin: document.getElementById('checkin')?.value || '',
+                checkout: document.getElementById('checkout')?.value || '',
+                guests: document.getElementById('guests')?.value || '',
+                roomType: document.getElementById('roomType')?.value || '',
+                specialRequests: document.getElementById('specialRequests')?.value || ''
+            };
+            
+            let isValid = true;
+            // list of fields to validate in order
+            const fieldsToCheck = ['fullname','email','mobile','checkin','guests','roomType','checkout'];
+            for(let field of fieldsToCheck) {
+                const fieldValid = validateField(field, formState);
+                if(!fieldValid) isValid = false;
+            }
+            return isValid;
+        }
+
+        // ---------- 6. Setup real-time blur validation & live inline validation ----------
+        function attachRealTimeValidation() {
+            const fields = ['fullname','email','mobile','checkin','checkout','guests','roomType'];
+            fields.forEach(fieldId => {
+                const element = document.getElementById(fieldId);
+                if(element) {
+                    element.addEventListener('blur', function() {
+                        // gather current form snapshot for checkout dependency
+                        const currentSnapshot = {
+                            fullname: document.getElementById('fullname')?.value || '',
+                            email: document.getElementById('email')?.value || '',
+                            mobile: document.getElementById('mobile')?.value || '',
+                            checkin: document.getElementById('checkin')?.value || '',
+                            checkout: document.getElementById('checkout')?.value || '',
+                            guests: document.getElementById('guests')?.value || '',
+                            roomType: document.getElementById('roomType')?.value || '',
+                        };
+                        validateField(fieldId, currentSnapshot);
+                    });
+                    // also on input clear error when user starts typing (optional but user-friendly)
+                    element.addEventListener('input', function() {
+                        clearFieldError(fieldId);
+                    });
+                }
+            });
+            // special: checkin change also re-validate checkout because dependency
+            const checkinElem = document.getElementById('checkin');
+            if(checkinElem) {
+                checkinElem.addEventListener('change', () => {
+                    if(document.getElementById('checkout')?.value) {
+                        const snap = {
+                            checkin: checkinElem.value,
+                            checkout: document.getElementById('checkout')?.value || ''
+                        };
+                        validateField('checkout', { ...snap, fullname:'',email:'',mobile:'',guests:'',roomType:'' });
+                    }
+                    validateField('checkin');
+                });
+            }
+            const checkoutElem = document.getElementById('checkout');
+            if(checkoutElem) {
+                checkoutElem.addEventListener('change', () => {
+                    const snap = { checkin: document.getElementById('checkin')?.value || '' };
+                    validateField('checkout', snap);
+                });
+            }
+        }
+
+        // ---------- 7. Show success summary (booking confirmation) ----------
+        function showBookingSuccess() {
+            const fullname = document.getElementById('fullname').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const mobile = document.getElementById('mobile').value.trim();
+            const checkin = document.getElementById('checkin').value;
+            const checkout = document.getElementById('checkout').value;
+            const guests = document.getElementById('guests').value;
+            const roomSelect = document.getElementById('roomType');
+            const roomText = roomSelect.options[roomSelect.selectedIndex]?.text || roomSelect.value;
+            const special = document.getElementById('specialRequests').value.trim() || "No special requests";
+            
+            const formattedCheckin = new Date(checkin).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
+            const formattedCheckout = new Date(checkout).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
+            
+            const message = `✅ Booking confirmed for ${fullname}! 📍 ${roomText} | ${guests} guest(s) | ${formattedCheckin} → ${formattedCheckout}. A confirmation email sent to ${email}. ✨`;
+            showFloatingMessage(message, false);
+            // Optionally log to console for lab demonstration
+            console.log("🎉 RESERVATION SUCCESS:", { fullname, email, mobile, checkin, checkout, guests, room: roomText, special });
+        }
+
+        // ---------- 8. Handle form submit (prevent default, validate, success) ----------
+        function handleSubmit(e) {
+            e.preventDefault();
+            const isValid = validateFullForm();
+            if(isValid) {
+                showBookingSuccess();
+                // Optionally: you can reset form or keep data. For UX we don't reset automatically to show success but you can
+                // Uncomment next line if you need full reset after success:
+                // document.getElementById('hotelBookingForm').reset();
+                // Clear all error styles after reset? we handle if we reset, but better keep success state
+                // For this demo, we just show success but keep data (user can reset manually)
+            } else {
+                showFloatingMessage("⚠️ Please fix the errors highlighted in the form before submitting.", true);
+                // scroll to first error field
+                const firstError = document.querySelector('.field-error');
+                if(firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // ---------- 9. Reset form & clear all errors ----------
+        function resetFormAndErrors() {
+            const form = document.getElementById('hotelBookingForm');
+            form.reset();
+            // clear all field error styles and messages
+            const fields = ['fullname','email','mobile','checkin','checkout','guests','roomType','specialRequests'];
+            fields.forEach(field => {
+                clearFieldError(field);
+                const inputElem = document.getElementById(field);
+                if(inputElem) inputElem.classList.remove('field-error');
+            });
+            showFloatingMessage("Form has been reset ✨", false);
+        }
+
+        // ---------- 10. Attach event listeners and init ----------
+        function init() {
+            const form = document.getElementById('hotelBookingForm');
+            if(form) {
+                form.addEventListener('submit', handleSubmit);
+            }
+            const resetBtn = document.getElementById('resetFormBtn');
+            if(resetBtn) resetBtn.addEventListener('click', resetFormAndErrors);
+            
+            attachRealTimeValidation();
+            
+            // additional: ensure initial state no error styles
+            const fieldsInit = ['fullname','email','mobile','checkin','checkout','guests','roomType'];
+            fieldsInit.forEach(f => clearFieldError(f));
+        }
+        
+        init();
+    })();
+</script>
+</body>
+</html>
