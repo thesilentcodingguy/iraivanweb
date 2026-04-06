@@ -1,0 +1,35 @@
+<h1>Simple Calculator</h1>
+
+<%= form_with url: "/calculate", method: :post, data: { turbo: false } do %>  <div>
+    <label>Number 1:</label>
+    <%= number_field_tag :num1, params[:num1], step: "any", required: true %>
+  </div>
+
+  <div>
+    <label>Number 2:</label>
+    <%= number_field_tag :num2, params[:num2], step: "any", required: true %>
+  </div>
+
+  <div>
+    <label>Operation:</label>
+    <%= select_tag :operation,
+          options_for_select([["Add (+)", "+"],
+                              ["Subtract (-)", "-"],
+                              ["Multiply (*)", "*"],
+                              ["Divide (/)", "/"]], params[:operation]) %>
+  </div>
+
+  <div>
+    <%= submit_tag "Calculate" %>
+  </div>
+<% end %>
+
+<hr>
+
+<% if @result %>
+  <h2>Result: <%= @result %></h2>
+<% end %>
+
+<% if @error %>
+  <h2 style="color:red;">Error: <%= @error %></h2>
+<% end %>
