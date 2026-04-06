@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simple E-Commerce</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; }
+.section { display: none; }
+.active { display: block; }
+.product { border:1px solid #ccc; padding:10px; margin:5px; }
+.total { font-weight:bold; font-size:18px; }
+button { margin-top:10px; }
+</style>
+</head>
+<body>
+
+<h1>Simple E-Commerce</h1>
+
+<!-- PRODUCTS PAGE -->
+<div id="products" class="section active">
+<h2>Products</h2>
+<div id="productList"></div>
+<p class="total">Total: ₹<span id="totalPrice">0</span></p>
+<button id="goToCart">Proceed to Cart</button>
+</div>
+
+<!-- CART PAGE -->
+<div id="cart" class="section">
+<h2>Cart</h2>
+<ul id="cartItems"></ul>
+<p class="total">Final Bill: ₹<span id="finalBill">0</span></p>
+<button id="goToPayment">Proceed to Payment</button>
+</div>
+
+<!-- PAYMENT PAGE -->
+<div id="payment" class="section">
+<h2>Payment Options</h2>
+
+<label><input type="radio" name="payment" value="upi"> UPI</label><br>
+<label><input type="radio" name="payment" value="netbanking"> Internet Banking</label><br>
+<label><input type="radio" name="payment" value="card"> Credit/Debit Card</label>
+
+<div id="paymentDetails"></div>
+
+<button id="confirmPayment">Confirm Payment</button>
+</div>
+
+<!-- CONFIRM PAGE -->
+<div id="confirm" class="section">
+<h2>Payment Successful</h2>
+<p>Thank you for your purchase!</p>
+<button id="reset">Reset</button>
+</div>
+
+<script>
+
+// JSON DATA (Simulating local JSON file)
+const products = [
+ {id:1, name:"Laptop", price:50000},
+ {id:2, name:"Headphones", price:2000},
+ {id:3, name:"Keyboard", price:1500},
+ {id:4, name:"Mouse", price:800},
+ {id:5, name:"Monitor", price:12000}
+];
+
+let selectedProducts = [];
+let total = 0;
+
+// LOAD PRODUCTS (AJAX Simulation)
+$(document).ready(function(){
+    $.each(products, function(index, product){
+        $('#productList').append(`
+            <div class="product">
+                <label>
+                <input type="checkbox" class="productCheck" data-id="${product.id}" data-price="${product.price}" data-name="${product.name}">
+                ${product.name} - ₹${product.price}
+                </label>
+            </div>
+        `);
+    });
+});
+
+// DYNAMIC PRICE CALCULATION
+$(document).on('change', '.productCheck', function(){
+    let price = parseInt($(this).data('price'));
+    let name = $(this).data('name');
+
+    if($(this).is(':checked')){
+        total += price;
+        selectedProducts.push({name:name, price:price});
+    } else {
+        total -= price;
+        selectedProducts = selectedProducts.filter(p => p.name !== name);
+    }
+
+    $('#totalPrice').text(total);
+});
+
+// GO TO CART
+$('#goToCart').click(function(){
+    $('#cartItems').empty();
+    selectedProducts.forEach(function(p){
+        $('#cartItems').append(`<li>${p.name} - ₹${p.price}</li>`);
+    });
+    $('#finalBill').text(total);
+    $('.section').removeClass('active');
+    $('#cart').addClass('active');
+});
+
+// GO TO PAYMENT
+$('#goToPayment').click(function(){
+    $('.section').removeClass('active');
+    $('#payment').addClass('active');
+});
+
+// PAYMENT OPTION HANDLING
+$('input[name="payment"]').change(function(){
+    let value = $(this).val();
+    let html = '';
+
+    if(value === 'upi'){
+        html = `
+            <h3>Enter UPI ID</h3>
+            <input type="text" placeholder="example@upi">
+        `;
+    }
+    else if(value === 'netbanking'){
+        html = `
+            <h3>Select Bank</h3>
+            <select>
+                <option>SBI</option>
+                <option>HDFC</option>
+                <option>ICICI</option>
+                <option>Axis Bank</option>
+            </select>
+        `;
+    }
+    else if(value === 'card'){
+        html = `
+            <h3>Card Details</h3>
+            <input type="text" placeholder="Card Number"><br><br>
+            <input type="text" placeholder="CVV"><br><br>
+            <input type="text" placeholder="Expiry Date">
+        `;
+    }
+
+    $('#paymentDetails').html(html);
+});
+
+// CONFIRM PAYMENT
+$('#confirmPayment').click(function(){
+    $('.section').removeClass('active');
+    $('#confirm').addClass('active');
+});
+
+// RESET
+$('#reset').click(function(){
+    location.reload();
+});
+
+</script>
+
+</body>
+</html>
