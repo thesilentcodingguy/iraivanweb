@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Form Validation</title>
+    
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <style>
+        body {
+            font-family: Arial;
+            padding: 30px;
+        }
+        input {
+            display: block;
+            margin: 10px 0;
+            padding: 8px;
+            width: 250px;
+        }
+        button {
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>Registration Form</h2>
+
+<form id="myForm">
+    <input type="text" id="name" placeholder="Name">
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <input type="password" id="confirmPassword" placeholder="Confirm Password">
+    <input type="date" id="date">
+    <input type="number" id="people" placeholder="Number of People">
+    
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+$(document).ready(function() {
+
+    $("#myForm").submit(function(e) {
+        e.preventDefault(); // prevent form submission
+        
+        let name = $("#name").val().trim();
+        let email = $("#email").val().trim();
+        let password = $("#password").val();
+        let confirmPassword = $("#confirmPassword").val();
+        let date = $("#date").val();
+        let people = $("#people").val();
+
+        // Name validation
+        if(name === "") {
+            alert("Name is required");
+            return;
+        }
+
+        // Email validation (simple regex)
+        let emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
+        if(!email.match(emailPattern)) {
+            alert("Enter a valid email");
+            return;
+        }
+
+        // Password validation
+        if(password.length < 6) {
+            alert("Password must be at least 6 characters");
+            return;
+        }
+
+        // Confirm password
+        if(password !== confirmPassword) {
+            alert("Passwords do not match");
+            return;
+        }
+
+        // Date validation
+        if(date === "") {
+            alert("Please select a date");
+            return;
+        }
+
+        // Number of people
+        if(people === "" || people <= 0) {
+            alert("Enter valid number of people");
+            return;
+        }
+
+        // SUCCESS
+        alert("Form submitted successfully!");
+    });
+
+});
+</script>
+
+</body>
+</html>
