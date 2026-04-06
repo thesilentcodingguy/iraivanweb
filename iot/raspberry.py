@@ -131,3 +131,49 @@ try:
 
 except KeyboardInterrupt:
     GPIO.cleanup()
+
+
+import RPi.GPIO as GPIO
+import time
+
+LED_PIN = 17  # GPIO pin (change if needed)
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(LED_PIN, GPIO.OUT)
+
+try:
+    while True:
+        GPIO.output(LED_PIN, GPIO.HIGH)  # LED ON
+        time.sleep(1)                    # 1 second
+
+        GPIO.output(LED_PIN, GPIO.LOW)   # LED OFF
+        time.sleep(2)                    # 2 seconds
+
+except KeyboardInterrupt:
+    print("Program stopped")
+
+finally:
+    GPIO.cleanup()
+
+
+import RPi.GPIO as GPIO
+import time
+
+BUZZER_PIN = 18  # GPIO pin (change if needed)
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(BUZZER_PIN, GPIO.OUT)
+
+try:
+    while True:
+        GPIO.output(BUZZER_PIN, GPIO.HIGH)  # Buzzer ON
+        time.sleep(1)                       # 1 second
+
+        GPIO.output(BUZZER_PIN, GPIO.LOW)   # Buzzer OFF
+        time.sleep(2)                       # 2 seconds
+
+except KeyboardInterrupt:
+    print("Program stopped")
+
+finally:
+    GPIO.cleanup()
