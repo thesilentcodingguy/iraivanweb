@@ -211,17 +211,25 @@
             $('#quizContent').hide();
             
             $.ajax({
-                url: 'https://opentdb.com/api.php?amount=5&type=multiple', // Free quiz API
+                url: 'questions.json', // Local JSON file
                 method: 'GET',
                 dataType: 'json',
                 timeout: 10000,
                 success: function(response) {
                     console.log('Questions loaded:', response);
-                    processQuestions(response.results);
+                    // Check if response has results array (API format) or direct questions array
+                    if (response.results) {
+                        processQuestions(response.results);
+                    } else if (Array.isArray(response)) {
+                        processLocalQuestions(response);
+                    } else {
+                        console.error('Invalid JSON format');
+                        useFallbackQuestions();
+                    }
                 },
                 error: function(xhr, status, error) {
-                    console.error('AJAX Error:', error);
-                    // Fallback to hardcoded questions if API fails
+                    console.error('Error loading local JSON:', error);
+                    // Fallback to hardcoded questions if JSON file fails to load
                     useFallbackQuestions();
                 },
                 complete: function() {
@@ -230,23 +238,32 @@
                 }
             });
         }
-        
         // Process API questions
-        function processQuestions(apiQuestions) {
-            questions = apiQuestions.map((q, index) => {
-                // Combine correct and incorrect answers
-                let allOptions = [...q.incorrect_answers, q.correct_answer];
-                // Shuffle options
-                allOptions = shuffleArray(allOptions);
-                
-                return {
-                    id: index + 1,
-                    text: decodeHTMLEntities(q.question),
-                    options: allOptions.map(opt => decodeHTMLEntities(opt)),
-                    correct: decodeHTMLEntities(q.correct_answer)
-                };
+        function processQuestions(localQuestions) {
+            questions = localQuestions.map((q, index) => {
+                // If options are already provided, use them as-is
+                if (q.options) {
+                    return {
+                        id: index + 1,
+                        text: q.question,
+                        options: q.options,
+                        correct: q.correct
+                    };
+                } 
+                // If only correct and incorrect answers are provided
+                else if (q.incorrect_answers && q.correct_answer) {
+                    let allOptions = [...q.incorrect_answers, q.correct_answer];
+                    allOptions = shuffleArray(allOptions);
+                    return {
+                        id: index + 1,
+                        text: q.question,
+                        options: allOptions,
+                        correct: q.correct_answer
+                    };
+                }
+                return q;
             });
-            
+    
             totalQuestions = questions.length;
             userAnswers = new Array(totalQuestions).fill(null);
             displayQuestion();
