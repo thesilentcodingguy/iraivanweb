@@ -1,0 +1,7 @@
+[
+    { "id": 1, "name": "Minimal Notebook", "price": 12.99 },
+    { "id": 2, "name": "Ceramic Mug", "price": 9.49 },
+    { "id": 3, "name": "Wireless Mouse", "price": 24.99 },
+    { "id": 4, "name": "Desk Lamp", "price": 34.50 },
+    { "id": 5, "name": "Plant Pot", "price": 15.75 }
+]

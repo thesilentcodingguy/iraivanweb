@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Store</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app">
+        <header>
+            <h1>Simple Store</h1>
+            <nav>
+                <button id="homeBtn" class="nav-btn active">Products</button>
+                <button id="cartBtn" class="nav-btn">Cart 🛒 <span id="cartCount">0</span></button>
+            </nav>
+        </header>
+
+        <main>
+            <!-- PRODUCTS PAGE -->
+            <div id="productsPage">
+                <div class="products-grid" id="productsGrid">
+                    <!-- Products will be loaded here via AJAX -->
+                    <div class="loader">Loading products...</div>
+                </div>
+                <div id="productsTotal" class="cart-summary" style="display:none;">
+                    <strong>Selected Total: $<span id="selectedTotal">0</span></strong>
+                    <button id="viewCartBtn">View Cart →</button>
+                </div>
+            </div>
+
+            <!-- CART PAGE (hidden by default) -->
+            <div id="cartPage" style="display:none;">
+                <div class="cart-summary">
+                    <h2>Your Cart</h2>
+                    <div id="cartItems"></div>
+                    <div class="total">Total: $<span id="cartTotal">0</span></div>
+                    
+                    <div class="payment-options">
+                        <h3>Payment Method</h3>
+                        <label><input type="radio" name="paymentMethod" value="card"> 💳 Credit Card</label><br>
+                        <label><input type="radio" name="paymentMethod" value="upi"> 📱 UPI</label><br>
+                        <label><input type="radio" name="paymentMethod" value="netbanking"> 🏦 Internet Banking</label>
+                        <div id="paymentStep" style="margin-top: 15px;"></div>
+                    </div>
+                    
+                    <button id="proceedConfirmBtn" disabled>Proceed to Confirm</button>
+                    <button id="resetCartBtn">Reset All</button>
+                    <button id="backProductsBtn">Back to Products</button>
+                </div>
+            </div>
+
+            <!-- CONFIRM PAGE (hidden by default) -->
+            <div id="confirmPage" style="display:none;">
+                <div class="cart-summary">
+                    <h2>Confirm Payment</h2>
+                    <div id="confirmDetails"></div>
+                    <button id="confirmPayBtn">✅ Confirm & Pay</button>
+                    <button id="backCartBtn">← Back to Cart</button>
+                    <button id="resetConfirmBtn">Reset All</button>
+                </div>
+            </div>
+
+            <!-- SUCCESS PAGE (hidden by default) -->
+            <div id="successPage" style="display:none;">
+                <div class="success-badge">
+                    ✅ Payment Successful!<br>
+                    Your order has been placed.<br><br>
+                    <button id="homeAfterSuccess">🏠 Go to Home</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
