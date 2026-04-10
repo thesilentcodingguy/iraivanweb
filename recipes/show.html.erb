@@ -1,0 +1,47 @@
+<p>
+  <strong>Title:</strong>
+  <%= @recipe.title %>
+</p>
+
+<p>
+  <strong>Ingredients:</strong>
+  <%= @recipe.ingredients %>
+</p>
+
+<p>
+  <strong>Created by:</strong>
+  <%= @recipe.user.name %>
+</p>
+
+<hr>
+
+<h3>Comments</h3>
+
+<% @recipe.comments.each do |comment| %>
+  <p>
+    <strong><%= comment.user.name %>:</strong>
+    <%= comment.title %>
+  </p>
+<% end %>
+
+<hr>
+
+<h3>Add Comment</h3>
+
+<%= form_with(model: [@recipe, Comment.new]) do |form| %>
+
+  <div>
+    <%= form.label :title %>
+    <%= form.text_field :title %>
+  </div>
+
+  <div>
+    <%= form.label :user_id %>
+    <%= form.number_field :user_id %>
+  </div>
+
+  <div>
+    <%= form.submit "Add Comment" %>
+  </div>
+
+<% end %>
