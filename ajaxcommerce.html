@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AJAX E-Commerce</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<style>
+body { font-family: Arial; margin:20px; }
+.section { display:none; }
+.active { display:block; }
+.product { border:1px solid #ccc; padding:10px; margin:5px; }
+.total { font-weight:bold; font-size:18px; }
+button { margin-top:10px; }
+</style>
+</head>
+
+<body>
+
+<h1>Real AJAX E-Commerce</h1>
+
+<!-- PRODUCTS -->
+<div id="products" class="section active">
+<h2>Products</h2>
+<div id="productList"></div>
+<p class="total">Total: ₹<span id="totalPrice">0</span></p>
+<button id="goToCart">Proceed to Cart</button>
+</div>
+
+<!-- CART -->
+<div id="cart" class="section">
+<h2>Cart</h2>
+<ul id="cartItems"></ul>
+<p class="total">Final Bill: ₹<span id="finalBill">0</span></p>
+<button id="goToPayment">Proceed</button>
+</div>
+
+<!-- PAYMENT -->
+<div id="payment" class="section">
+<h2>Payment</h2>
+
+<label><input type="radio" name="pay" value="upi"> UPI</label><br>
+<label><input type="radio" name="pay" value="card"> Card</label>
+
+<div id="paymentDetails"></div>
+
+<button id="confirmPayment">Pay Now</button>
+</div>
+
+<!-- SUCCESS -->
+<div id="success" class="section">
+<h2>✅ Payment Successful</h2>
+<p id="orderMsg"></p>
+<button onclick="location.reload()">Reset</button>
+</div>
+
+<script>
+
+// ===============================
+// VARIABLES
+// ===============================
+let cart = [];
+let total = 0;
+
+// ===============================
+// ✅ REAL GET AJAX (products.json)
+// ===============================
+$(document).ready(function(){
+
+    $.ajax({
+        url: "products.json",
+        method: "GET",
+        dataType: "json",
+
+        success: function(products){
+
+            $.each(products, function(i, p){
+                $('#productList').append(`
+                    <div class="product">
+                        <label>
+                        <input type="checkbox" class="chk"
+                        data-name="${p.name}" data-price="${p.price}">
+                        ${p.name} - ₹${p.price}
+                        </label>
+                    </div>
+                `);
+            });
+
+        },
+
+        error: function(){
+            alert("Error loading products.json");
+        }
+
+    });
+
+});
+
+// ===============================
+// ADD TO CART
+// ===============================
+$(document).on('change','.chk',function(){
+
+    let name = $(this).data('name');
+    let price = parseInt($(this).data('price'));
+
+    if($(this).is(':checked')){
+        cart.push({name, price});
+        total += price;
+    } else {
+        cart = cart.filter(p => p.name !== name);
+        total -= price;
+    }
+
+    $('#totalPrice').text(total);
+});
+
+// ===============================
+// CART PAGE
+// ===============================
+$('#goToCart').click(function(){
+
+    $('#cartItems').empty();
+
+    cart.forEach(p=>{
+        $('#cartItems').append(`<li>${p.name} - ₹${p.price}</li>`);
+    });
+
+    $('#finalBill').text(total);
+
+    $('.section').removeClass('active');
+    $('#cart').addClass('active');
+});
+
+// ===============================
+// PAYMENT PAGE
+// ===============================
+$('#goToPayment').click(function(){
+    $('.section').removeClass('active');
+    $('#payment').addClass('active');
+});
+
+// ===============================
+// PAYMENT DETAILS
+// ===============================
+$('input[name="pay"]').change(function(){
+
+    let val = $(this).val();
+    let html = "";
+
+    if(val==="upi"){
+        html = `<input type="text" placeholder="Enter UPI ID">`;
+    }
+    else{
+        html = `
+            <input type="text" placeholder="Card Number"><br>
+            <input type="text" placeholder="CVV">
+        `;
+    }
+
+    $('#paymentDetails').html(html);
+});
+
+// ===============================
+// ✅ POST (SIMULATED using localStorage)
+// ===============================
+$('#confirmPayment').click(function(){
+
+    let order = {
+        items: cart,
+        total: total,
+        time: new Date().toLocaleString()
+    };
+
+    // store in localStorage
+    let orders = JSON.parse(localStorage.getItem("orders")) || [];
+    orders.push(order);
+    localStorage.setItem("orders", JSON.stringify(orders));
+
+    $('#orderMsg').text("Order placed! Amount ₹" + total);
+
+    $('.section').removeClass('active');
+    $('#success').addClass('active');
+
+    console.log("Stored Orders:", orders);
+});
+
+</script>
+
+</body>
+</html>
