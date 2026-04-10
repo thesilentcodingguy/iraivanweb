@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FAQ</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .answer {
+            display: none;
+            margin-left: 20px;
+        }
+        .question {
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>FAQ</h2>
+
+<div class="faq">
+    <div class="question">What is Ruby on Rails?</div>
+    <div class="answer">It is a web development framework written in Ruby.</div>
+
+    <div class="question">What is jQuery?</div>
+    <div class="answer">It is a JavaScript library for DOM manipulation.</div>
+
+    <div class="question">What is AJAX?</div>
+    <div class="answer">It allows asynchronous data fetching without reloading the page.</div>
+</div>
+
+<script>
+$(document).ready(function(){
+
+    $(".question").click(function(){
+
+        // If this answer is already visible -> slide up
+        if($(this).next(".answer").is(":visible")){
+            $(this).next(".answer").slideUp();
+        } 
+        else {
+            // Hide all answers first
+            $(".answer").slideUp();
+
+            // Show clicked one
+            $(this).next(".answer").slideDown();
+        }
+
+    });
+
+});
+</script>
+
+</body>
+</html>
