@@ -17,7 +17,7 @@ button { margin-top:10px; }
 
 <body>
 
-<h1>Real AJAX E-Commerce</h1>
+<h1>AJAX E-Commerce</h1>
 
 <!-- PRODUCTS -->
 <div id="products" class="section active">
@@ -56,15 +56,15 @@ button { margin-top:10px; }
 
 <script>
 
-// ===============================
+// =====================
 // VARIABLES
-// ===============================
+// =====================
 let cart = [];
 let total = 0;
 
-// ===============================
-// ✅ REAL GET AJAX (products.json)
-// ===============================
+// =====================
+// ✅ REAL GET (AJAX)
+// =====================
 $(document).ready(function(){
 
     $.ajax({
@@ -89,16 +89,16 @@ $(document).ready(function(){
         },
 
         error: function(){
-            alert("Error loading products.json");
+            alert("Failed to load products!");
         }
 
     });
 
 });
 
-// ===============================
+// =====================
 // ADD TO CART
-// ===============================
+// =====================
 $(document).on('change','.chk',function(){
 
     let name = $(this).data('name');
@@ -115,9 +115,9 @@ $(document).on('change','.chk',function(){
     $('#totalPrice').text(total);
 });
 
-// ===============================
+// =====================
 // CART PAGE
-// ===============================
+// =====================
 $('#goToCart').click(function(){
 
     $('#cartItems').empty();
@@ -132,17 +132,17 @@ $('#goToCart').click(function(){
     $('#cart').addClass('active');
 });
 
-// ===============================
+// =====================
 // PAYMENT PAGE
-// ===============================
+// =====================
 $('#goToPayment').click(function(){
     $('.section').removeClass('active');
     $('#payment').addClass('active');
 });
 
-// ===============================
-// PAYMENT DETAILS
-// ===============================
+// =====================
+// PAYMENT INPUT
+// =====================
 $('input[name="pay"]').change(function(){
 
     let val = $(this).val();
@@ -161,9 +161,9 @@ $('input[name="pay"]').change(function(){
     $('#paymentDetails').html(html);
 });
 
-// ===============================
-// ✅ POST (SIMULATED using localStorage)
-// ===============================
+// =====================
+// ⚠️ FAKE POST (localStorage)
+// =====================
 $('#confirmPayment').click(function(){
 
     let order = {
@@ -172,7 +172,6 @@ $('#confirmPayment').click(function(){
         time: new Date().toLocaleString()
     };
 
-    // store in localStorage
     let orders = JSON.parse(localStorage.getItem("orders")) || [];
     orders.push(order);
     localStorage.setItem("orders", JSON.stringify(orders));
@@ -182,7 +181,7 @@ $('#confirmPayment').click(function(){
     $('.section').removeClass('active');
     $('#success').addClass('active');
 
-    console.log("Stored Orders:", orders);
+    console.log("Saved Orders:", orders);
 });
 
 </script>
